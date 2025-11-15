@@ -1,0 +1,177 @@
+/* Road panel specific styles */
+
+.road-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #F5F5F5;
+  border-radius: 8px;
+  font-size: 17px;
+}
+
+.truck-line-item {
+  background: #F5F5F5;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.truck-line-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.profit-badge {
+  padding: 6px 14px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.profit-badge.positive {
+  background: #C8E6C9;
+  color: #2E7D32;
+}
+
+.profit-badge.negative {
+  background: #FFCDD2;
+  color: #C62828;
+}
+
+.truck-line-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  color: #666;
+}
+
+.truck-input {
+  width: 70px;
+  padding: 6px 10px;
+  border: 1px solid #CCC;
+  border-radius: 6px;
+  font-size: 17px;
+  margin-left: 10px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 17px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.goods-select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #DDD;
+  border-radius: 8px;
+  font-size: 17px;
+  background: white;
+  cursor: pointer;
+}
+
+.goods-select:focus {
+  outline: none;
+  border-color: #1976D2;
+}
+
+.truck-slider {
+  width: calc(100% - 100px);
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.truck-count {
+  font-weight: 600;
+  color: #1976D2;
+}
+
+.profit-preview {
+  background: #E3F2FD;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.profit-preview h4 {
+  margin: 0 0 16px 0;
+  color: #1976D2;
+  font-size: 19px;
+}
+
+.profit-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profit-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  padding: 5px 0;
+}
+
+.profit-row.total {
+  border-top: 2px solid #1976D2;
+  padding-top: 10px;
+  margin-top: 6px;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.profit-row .cost {
+  color: #D32F2F;
+}
+
+.profit-row .revenue {
+  color: #388E3C;
+}
+
+.profit-row .positive {
+  color: #2E7D32;
+  font-weight: bold;
+}
+
+.profit-row .negative {
+  color: #C62828;
+  font-weight: bold;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .truck-line-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .truck-slider {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  
+  .truck-count {
+    display: block;
+    margin-top: 10px;
+  }
+}

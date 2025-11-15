@@ -1,0 +1,285 @@
+.panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.panel {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 2px solid #E0E0E0;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 28px;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 36px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.close-btn:hover {
+  background: #F5F5F5;
+}
+
+.panel-content {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.section {
+  margin-bottom: 28px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section h3 {
+  margin: 0 0 16px 0;
+  font-size: 22px;
+  color: #555;
+}
+
+.section h4 {
+  margin: 16px 0 12px 0;
+  font-size: 18px;
+  color: #666;
+}
+
+.build-btn, .upgrade-btn {
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.build-btn:hover, .upgrade-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+}
+
+.build-btn:active, .upgrade-btn:active {
+  transform: translateY(0);
+}
+
+.upgrade-btn.small {
+  padding: 8px 16px;
+  font-size: 15px;
+  width: auto;
+}
+
+.warehouse-info {
+  margin: 16px 0;
+}
+
+.capacity-bar {
+  width: 100%;
+  height: 30px;
+  background: #E0E0E0;
+  border-radius: 15px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.capacity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4CAF50 0%, #8BC34A 100%);
+  transition: width 0.3s;
+}
+
+.capacity-text {
+  font-size: 17px;
+  color: #666;
+  margin: 0;
+}
+
+.storage-list {
+  margin-top: 16px;
+}
+
+.storage-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 17px;
+  color: #555;
+}
+
+.factory-item {
+  background: #F5F5F5;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.factory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.factory-level {
+  background: #1976D2;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.factory-output {
+  font-size: 16px;
+  color: #666;
+  margin: 6px 0 10px 0;
+}
+
+.build-factory-section {
+  margin-top: 20px;
+}
+
+.goods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.good-btn {
+  padding: 16px;
+  background: white;
+  border: 2px solid #1976D2;
+  color: #1976D2;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.good-btn:hover {
+  background: #1976D2;
+  color: white;
+  transform: scale(1.05);
+}
+
+.good-btn small {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.market-item {
+  background: #F9F9F9;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+}
+
+.market-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.profit {
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 17px;
+}
+
+.profit.positive {
+  background: #C8E6C9;
+  color: #2E7D32;
+}
+
+.profit.negative {
+  background: #FFCDD2;
+  color: #C62828;
+}
+
+.market-details {
+  display: flex;
+  gap: 20px;
+  font-size: 16px;
+  color: #666;
+}
+
+@media (max-width: 600px) {
+  .panel {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 12px 12px 0 0;
+  }
+  
+  .panel-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+  
+  .goods-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  
+  .market-details {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
