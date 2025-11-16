@@ -566,7 +566,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 // Main simulation tick function
-function simulateTick(prevState: GameState): GameState {
+export function simulateTick(prevState: GameState): GameState {
   let newState = { ...prevState, currentDay: prevState.currentDay + 1 };
   
   // Step 1: Production
@@ -582,7 +582,7 @@ function simulateTick(prevState: GameState): GameState {
 }
 
 // Simulate production from factories
-function simulateProduction(state: GameState): GameState {
+export function simulateProduction(state: GameState): GameState {
   const newWarehouses = { ...state.warehouses };
   
   // Production from old factories (existing goods system)
@@ -628,7 +628,7 @@ function simulateProduction(state: GameState): GameState {
 }
 
 // Simulate logistics (truck movements)
-function simulateLogistics(state: GameState): GameState {
+export function simulateLogistics(state: GameState): GameState {
   const newWarehouses = { ...state.warehouses };
   let totalCost = 0;
   
@@ -672,7 +672,7 @@ function simulateLogistics(state: GameState): GameState {
 }
 
 // Simulate markets and sales
-function simulateMarkets(state: GameState): GameState {
+export function simulateMarkets(state: GameState): GameState {
   const newMarkets = { ...state.markets };
   
   // Update supply and prices (but don't auto-sell)
