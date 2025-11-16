@@ -7,6 +7,46 @@
     <meta name="description" content="Tycooner - Build your European logistics empire! A mobile-friendly strategy game." />
     <meta name="theme-color" content="#667eea" />
     <title>Tycooner - European Logistics Tycoon</title>
+    <style>
+      /* Critical CSS to prevent FOUC (Flash of Unstyled Content) */
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      
+      /* Ensure all overlays/modals are properly positioned from the start */
+      .modal-overlay,
+      .panel-overlay,
+      .unlock-modal-overlay,
+      .loading-screen {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        /* Force GPU acceleration and prevent layout shifts */
+        transform: translate3d(0, 0, 0);
+        will-change: transform;
+      }
+      
+      /* Center any modal content immediately */
+      .modal,
+      .unlock-modal,
+      .loading-content {
+        margin: auto;
+      }
+      
+      /* Hide root until React mounts */
+      #root:empty {
+        background: #000;
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>

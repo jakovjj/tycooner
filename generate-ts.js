@@ -1,5 +1,7 @@
 import fs from 'fs';
 
+// Source of truth for map data
+// Switched to europe-final.json so manual removals (e.g., Luxembourg) take effect
 const data = JSON.parse(fs.readFileSync('europe-final.json', 'utf8'));
 
 let tsContent = `// Real geographic data from Natural Earth dataset

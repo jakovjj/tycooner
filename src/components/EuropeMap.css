@@ -30,13 +30,15 @@
   transition: opacity 0.15s, fill 0.2s, filter 0.2s;
   stroke-linejoin: round;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+  paint-order: stroke fill;
 }
 
 .country:hover {
   opacity: 0.85;
   stroke: #1565C0;
-  stroke-width: 0.15;
+  stroke-width: 0.2;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25)) brightness(1.05);
+  paint-order: stroke fill;
 }
 
 .country:active {
@@ -61,15 +63,119 @@
 }
 
 .road {
-  cursor: pointer;
-  pointer-events: stroke;
-  transition: stroke-width 0.2s;
+  stroke: #2E2E2E;
+  stroke-width: 0.25;
+  stroke-linecap: round;
+  stroke-opacity: 0.7; /* increased opacity for better visibility */
+  stroke-dasharray: 0.6 0.6; /* dashed to mimic rail ties */
+  pointer-events: none; /* decorative */
 }
 
-.road:hover {
-  stroke: #5D4037;
-  stroke-width: 0.5;
+.roads-layer .road:hover {
+  stroke-opacity: 0.65;
 }
 
 @media (max-width: 600px) {
+  .country-label {
+    font-size: 0.45px;
+  }
+}
 
+/* Country Tooltip */
+.country-tooltip {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1E3A8A 0%, #1E40AF 100%);
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  z-index: 600;
+  pointer-events: none;
+  animation: tooltipFadeIn 0.2s ease-in-out;
+  min-width: 300px;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.tooltip-flag {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.tooltip-content h3 {
+  color: white;
+  margin: 0 0 16px 0;
+  text-align: center;
+  font-size: 24px;
+}
+
+.tooltip-stats {
+  display: flex;
+  gap: 16px;
+  justify-content: space-around;
+  margin-bottom: 12px;
+}
+
+.tooltip-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tooltip-stat span:first-child {
+  font-size: 24px;
+}
+
+.tooltip-bonuses {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+.tooltip-bonus-label {
+  color: #FDE68A;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.tooltip-bonus-item {
+  color: #FEF3C7;
+  font-size: 12px;
+  padding: 3px 0;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .country-tooltip {
+    bottom: 60px;
+    min-width: 260px;
+    padding: 16px 20px;
+  }
+  
+  .tooltip-content h3 {
+    font-size: 20px;
+  }
+  
+  .tooltip-flag {
+    font-size: 40px;
+  }
+}

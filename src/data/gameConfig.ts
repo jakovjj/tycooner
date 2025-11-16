@@ -41,7 +41,7 @@ export const GAME_CONFIG = {
 
 export const GOOD_COLORS: Record<string, string> = {
   grain: '#FFC107',
-  steel: '#9E9E9E',
+  clothing: '#9E9E9E',
   consumerGoods: '#2196F3',
   electronics: '#9C27B0',
   processedFood: '#FF9800'

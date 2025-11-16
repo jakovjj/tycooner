@@ -18,7 +18,7 @@ const countryMap = {
   'Romania': 'RO',
   'Netherlands': 'NL',
   'Belgium': 'BE',
-  'Luxembourg': 'BE', // Merge Luxembourg into Belgium
+  'Luxembourg': 'LU',
   'Greece': 'GR',
   'Portugal': 'PT',
   'Czechia': 'CZ',
@@ -50,15 +50,16 @@ const countryMap = {
 
 // Neighbor relationships
 const neighbors = {
-  'FR': ['DE', 'BE', 'IT', 'CH', 'ES'],
-  'DE': ['FR', 'BE', 'NL', 'DK', 'PL', 'CZ', 'AT', 'CH'],
+  'FR': ['DE', 'BE', 'LU', 'IT', 'CH', 'ES'],
+  'DE': ['FR', 'BE', 'LU', 'NL', 'DK', 'PL', 'CZ', 'AT', 'CH'],
   'GB': ['IE'],
   'IT': ['FR', 'CH', 'AT', 'SI', 'HR'],
   'ES': ['FR', 'PT'],
   'PL': ['DE', 'CZ', 'SK', 'UA', 'BY', 'LT'],
   'RO': ['HU', 'RS', 'BG', 'UA', 'MD'],
   'NL': ['DE', 'BE'],
-  'BE': ['FR', 'DE', 'NL'],
+  'BE': ['FR', 'DE', 'LU', 'NL'],
+  'LU': ['FR', 'DE', 'BE'],
   'GR': ['AL', 'MK', 'BG'],
   'PT': ['ES'],
   'CZ': ['DE', 'PL', 'SK', 'AT'],

@@ -33,6 +33,33 @@ export interface Warehouse {
   storage: Record<string, number>; // goodId -> amount
 }
 
+export type ProductionType = 'farm' | 'factory' | 'ranch';
+
+export interface ProductionBuildingInstance {
+  type: ProductionType;
+  outputPerDay: number; // per building output
+}
+
+export interface CountryProduction {
+  countryId: string;
+  buildings: Record<ProductionType, ProductionBuildingInstance[]>; // multiple per type
+}
+
+export interface ProductionPricing {
+  // Resource sell prices in this country
+  grainSellPrice: number;
+  clothingSellPrice: number;
+  meatSellPrice: number;
+  
+  // Building costs for this country
+  farmBuildCost: number;
+  farmUpgradeCost: number;
+  factoryBuildCost: number;
+  factoryUpgradeCost: number;
+  ranchBuildCost: number;
+  ranchUpgradeCost: number;
+}
+
 export interface Factory {
   id: string;
   countryId: string;
@@ -66,17 +93,22 @@ export interface Country {
   neighbors: string[];
   population: number;
   wageLevel: number; // multiplier 0.5 - 2.0
-  incomeLevel: number; // multiplier 0.5 - 2.0
+  // incomeLevel removed per new pricing model
   resourceBonus: Record<string, number>; // goodId -> bonus multiplier
+  productionPricing?: ProductionPricing; // Per-country pricing for production
 }
 
 export interface GameState {
   money: number;
-  adminPoints: number;
+  unlockedCountries: string[]; // Array of unlocked country IDs
+  challengeTargetCountryId: string | null;
+  challengeDeadline: number | null;
+  gameOver: boolean;
   countries: Record<string, Country>;
   goods: Record<string, Good>;
   markets: Record<string, Market>; // key: `${countryId}-${goodId}`
   warehouses: Record<string, Warehouse>; // key: countryId
+  production: Record<string, CountryProduction>; // key: countryId
   factories: Record<string, Factory>; // key: factoryId
   roads: Record<string, Road>; // key: roadId
   truckLines: Record<string, TruckLine>; // key: truckLineId

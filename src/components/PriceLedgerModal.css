@@ -1,0 +1,151 @@
+.price-ledger-modal {
+  max-width: 900px;
+  width: 95%;
+  max-height: min(80vh, 720px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Ledger specific overlay positioning: anchor near top bar instead of vertical center */
+.ledger-overlay {
+  align-items: flex-start !important;
+  padding-top: 6px; /* small spacing below top bar */
+}
+
+.ledger-overlay .price-ledger-modal {
+  margin-top: 0;
+}
+
+/* Header adjustments */
+.price-ledger-header {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  z-index: 5;
+  border-bottom: 1px solid #E0E0E0; /* slimmer to visually merge with table header */
+  box-shadow: 0 6px 12px rgba(15,23,42,0.08);
+}
+
+.ledger-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.ledger-title-icon {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg,#1976D2,#1565C0);
+  color: #fff;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.price-ledger-body {
+  flex: 1;
+  padding: 0 20px 24px 20px; /* slight horizontal reduction */
+  background: #fff;
+  overflow-y: auto;
+}
+
+.ledger-hint {
+  margin: 12px 0 0 0;
+  font-size: 13px;
+  color: #666;
+  text-align: right;
+}
+
+.ledger-hint.below-table {
+  text-align: left;
+}
+
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ledger-table thead th {
+  position: sticky;
+  top: 0;
+  background: #F4F6FB;
+  font-weight: 700;
+  padding: 6px 12px 8px 12px; /* tighter top padding to reduce perceived gap */
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid #DDD;
+  user-select: none;
+  z-index: 2;
+}
+
+.ledger-table thead th.country-col {
+  cursor: default;
+}
+
+.ledger-table tbody td, .ledger-table tbody th.country-name {
+  padding: 8px 12px;
+  border-bottom: 1px solid #EEE;
+}
+
+.ledger-table tbody tr:hover {
+  background: #F5F5F5;
+}
+
+.ledger-table tbody th.country-name {
+  text-align: left;
+  font-weight: 600;
+  background: #fff;
+}
+
+.resource-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.resource-icon {
+  width: 18px;
+  height: 18px;
+  color: #1565C0;
+}
+
+.sort-indicator {
+  margin-left: 4px;
+  font-size: 11px;
+  opacity: 0.6;
+}
+
+/* Close button styling for ledger (scoped) */
+.price-ledger-modal .close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #666;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.price-ledger-modal .close-btn:hover {
+  background: #F5F5F5;
+  color: #333;
+}
+
+@media (max-width: 600px) {
+  .ledger-table thead th, .ledger-table tbody td, .ledger-table tbody th.country-name {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+}

@@ -1,11 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
 import './TopBar.css';
 
 export const TopBar: React.FC = () => {
-  const { state, togglePause, setTickSpeed } = useGame();
+  const { state, getNextUnlockCost, restartGame } = useGame();
 
-  const currentSpeed = state.isPaused ? 'paused' : (state.tickSpeed === 2000 ? 'normal' : 'double');
+  const nextCost = getNextUnlockCost();
+
+  // Convert currentDay -> Month Day, Year (Year 1 starts at day 0)
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const monthLengths = [31,28,31,30,31,30,31,31,30,31,30,31];
+  let remaining = state.currentDay; // day 0 = Jan 1 Year 1
+  let year = 1;
+  while (remaining >= 365) { remaining -= 365; year++; }
+  let monthIndex = 0;
+  while (remaining >= monthLengths[monthIndex]) {
+    remaining -= monthLengths[monthIndex];
+    monthIndex++;
+  }
+  const dayOfMonth = remaining + 1;
+  const dateLabel = `${monthNames[monthIndex]} ${dayOfMonth}, Year ${year}`;
+
+  // Challenge countdown
+  // Challenge timing removed here (handled by ChallengeBanner)
+
+  // Challenge info moved to ChallengeBanner component
+
+  const [showMenu, setShowMenu] = useState(false);
 
   return (
     <div className="top-bar">
@@ -19,52 +40,50 @@ export const TopBar: React.FC = () => {
         </div>
         
         <div className="stat-card">
-          <div className="stat-icon">⚙️</div>
+          <div className="stat-icon">🗺️</div>
           <div className="stat-content">
-            <div className="stat-label">Admin Points</div>
-            <div className="stat-value">{state.adminPoints}</div>
+            <div className="stat-label">Unlocked</div>
+            <div className="stat-value">{state.unlockedCountries.length} / {Object.keys(state.countries).length}</div>
+            <div className="unlock-info" style={{ fontSize: '0.75rem', opacity: 0.8 }}>
+              Next unlock cost: ${nextCost.toLocaleString()}
+            </div>
           </div>
         </div>
         
         <div className="stat-card">
           <div className="stat-icon">📅</div>
           <div className="stat-content">
-            <div className="stat-label">Day</div>
-            <div className="stat-value">{state.currentDay}</div>
+            <div className="stat-label">Date</div>
+            <div className="stat-value" style={{ fontSize: '0.9rem' }}>{dateLabel}</div>
+            {/* Challenge info removed from date card */}
           </div>
         </div>
       </div>
       
-      <div className="controls-panel">
-        <div className="speed-controls">
-          <button 
-            onClick={() => {
-              if (!state.isPaused) togglePause();
-            }}
-            className={`speed-btn ${currentSpeed === 'paused' ? 'active' : ''}`}
-          >
-            ⏸️ Pause
-          </button>
-          <button 
-            onClick={() => {
-              if (state.isPaused) togglePause();
-              setTickSpeed(2000);
-            }}
-            className={`speed-btn ${currentSpeed === 'normal' ? 'active' : ''}`}
-          >
-            ▶️ Normal
-          </button>
-          <button 
-            onClick={() => {
-              if (state.isPaused) togglePause();
-              setTickSpeed(1000);
-            }}
-            className={`speed-btn ${currentSpeed === 'double' ? 'active' : ''}`}
-          >
-            ⏩ 2x Speed
-          </button>
-        </div>
+      <div className="controls-panel" style={{ justifyContent: 'flex-end', position: 'relative' }}>
+        <button
+          onClick={() => setShowMenu(true)}
+          className="hamburger-btn"
+          aria-label="Open menu"
+        >
+          <span className="hamburger-icon" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+        </button>
       </div>
+      {showMenu && (
+        <div className="settings-overlay" onClick={() => setShowMenu(false)} role="dialog" aria-modal="true">
+          <div className="settings-panel" onClick={e => e.stopPropagation()}>
+            <div className="settings-panel-header">
+              <h2 className="settings-title">Menu</h2>
+              <button className="overlay-close-btn" onClick={() => setShowMenu(false)} aria-label="Close menu">×</button>
+            </div>
+            <div className="settings-panel-body">
+              <button onClick={restartGame} className="primary-menu-btn">Restart Game</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

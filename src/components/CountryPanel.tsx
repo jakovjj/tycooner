@@ -1,6 +1,7 @@
 import React from 'react';
 import { useGame } from '../context/GameContext';
 import type { Factory } from '../types/game';
+import { getCountryFlag } from '../data/countryFlags';
 import './CountryPanel.css';
 
 interface CountryPanelProps {
@@ -14,22 +15,10 @@ export const CountryPanel: React.FC<CountryPanelProps> = ({ countryId, onClose }
   const country = state.countries[countryId];
   const warehouse = state.warehouses[countryId];
   const factories = Object.values(state.factories).filter(f => f.countryId === countryId);
+  const isLocked = !state.unlockedCountries.includes(countryId);
 
   if (!country) return null;
   
-  // Get country flag emoji
-  const getFlagEmoji = (code: string): string => {
-    const flags: Record<string, string> = {
-      GB: '🇬🇧', FR: '🇫🇷', DE: '🇩🇪', IT: '🇮🇹', ES: '🇪🇸', PL: '🇵🇱', PT: '🇵🇹',
-      NL: '🇳🇱', BE: '🇧🇪', CH: '🇨🇭', AT: '🇦🇹', CZ: '🇨🇿', SE: '🇸🇪', NO: '🇳🇴',
-      FI: '🇫🇮', DK: '🇩🇰', GR: '🇬🇷', RO: '🇷🇴', HU: '🇭🇺', SK: '🇸🇰', BG: '🇧🇬',
-      HR: '🇭🇷', SI: '🇸🇮', LT: '🇱🇹', LV: '🇱🇻', EE: '🇪🇪', IE: '🇮🇪', RS: '🇷🇸',
-      BA: '🇧🇦', AL: '🇦🇱', MK: '🇲🇰', ME: '🇲🇪', LU: '🇱🇺', XK: '🇽🇰', BY: '🇧🇾', 
-      UA: '🇺🇦', MD: '🇲🇩'
-    };
-    return flags[code] || '🏳️';
-  };
-
   const getTotalStorage = (): number => {
     if (!warehouse) return 0;
     return Object.values(warehouse.storage).reduce((sum, amt) => sum + amt, 0);
@@ -180,16 +169,36 @@ export const CountryPanel: React.FC<CountryPanelProps> = ({ countryId, onClose }
       <div className="panel country-panel" onClick={e => e.stopPropagation()}>
         <div className="panel-header">
           <h2>
-            <span style={{ fontSize: '32px', marginRight: '12px' }}>{getFlagEmoji(countryId)}</span>
+            <span style={{ fontSize: '32px', marginRight: '12px' }}>{getCountryFlag(countryId)}</span>
             {country.name}
+            {isLocked && <span style={{ marginLeft: '12px', fontSize: '20px' }}>🔒</span>}
           </h2>
           <button onClick={onClose} className="close-btn">×</button>
         </div>
         
         <div className="panel-content">
-          {renderWarehouseSection()}
-          {renderFactoriesSection()}
-          {renderMarketSection()}
+          {isLocked ? (
+            <div className="section locked-message">
+              <h3>🔒 Country Locked</h3>
+              <p>This country is currently locked. Level up to unlock new countries!</p>
+              <div className="country-info stat-pill-row">
+                <span className="stat-pill">
+                  <span className="stat-pill-label">Population</span>
+                  <span className="stat-pill-value">{(country.population / 1_000_000).toFixed(1)}M</span>
+                </span>
+                <span className="stat-pill">
+                  <span className="stat-pill-label">Wage Level</span>
+                  <span className="stat-pill-value">{(country.wageLevel * 100).toFixed(0)}%</span>
+                </span>
+              </div>
+            </div>
+          ) : (
+            <>
+              {renderWarehouseSection()}
+              {renderFactoriesSection()}
+              {renderMarketSection()}
+            </>
+          )}
         </div>
       </div>
     </div>

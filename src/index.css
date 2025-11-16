@@ -31,3 +31,22 @@ button {
   font-family: inherit;
 }
 
+/* Prevent FOUC (Flash of Unstyled Content) - ensure modals/overlays are centered immediately */
+.loading-screen,
+.modal-overlay,
+.unlock-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Hide content until React hydrates to prevent flashing */
+#root:empty {
+  background: #000;
+}
+

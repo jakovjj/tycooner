@@ -1,13 +1,13 @@
 .panel-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   z-index: 1000;
   padding: 20px;
 }
@@ -260,6 +260,37 @@
   gap: 20px;
   font-size: 16px;
   color: #666;
+}
+
+.locked-message {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.locked-message h3 {
+  font-size: 28px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.locked-message p {
+  font-size: 18px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.locked-message .country-info {
+  background: #F5F5F5;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: left;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.locked-message .country-info .stat-pill {
+  flex: 1 1 180px;
 }
 
 @media (max-width: 600px) {

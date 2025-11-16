@@ -1,10 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { europeCountriesGeo, coordinatesToPath, calculateMapBounds } from '../data/europeMapGeo';
 import { useGame } from '../context/GameContext';
 import './EuropeMap.css';
 
 interface EuropeMapProps {
   onCountryClick: (countryId: string) => void;
+  isUnlockMode?: boolean;
+  isGameStart?: boolean;
 }
 
 interface Transform {
@@ -13,10 +15,18 @@ interface Transform {
   scale: number;
 }
 
-export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick }) => {
-  const { state } = useGame();
+export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMode = false, isGameStart = false }) => {
+  const { state, unlockCountry, setShowUnlockModal } = useGame();
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, scale: 0.55 });
-  const [targetTransform, setTargetTransform] = useState<Transform>({ x: 0, y: -450, scale: 0.55 });
+  const [targetTransform, setTargetTransform] = useState<Transform>({ x: 0, y: -300, scale: 0.55 });
+  
+  // Memoize the offered countries to prevent re-randomization
+  const offeredCountries = useMemo(() => {
+    if (!isUnlockMode) return [];
+    const allCountryIds = Object.keys(state.countries);
+    const lockedCountries = allCountryIds.filter(id => !state.unlockedCountries.includes(id));
+    return isGameStart ? allCountryIds : lockedCountries; // all locked countries available for selection
+  }, [isUnlockMode, isGameStart, state.countries, state.unlockedCountries]);
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
   
@@ -27,30 +37,53 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick }) => {
   const viewBoxWidth = bounds.width;
   const viewBoxHeight = bounds.height;
 
-  // Smooth lerp animation
+  // Precompute SVG path strings once to avoid heavy recomputation each render
+  const countryPathMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const c of europeCountriesGeo) {
+      map[c.id] = coordinatesToPath(c.coordinates);
+    }
+    return map;
+  }, []);
+
+  // Smooth lerp animation (paused in unlock mode, ends when close to target)
+  const animationRef = useRef<number | null>(null);
+  // Apply animation only outside unlock mode
   useEffect(() => {
-    let animationFrame: number;
-    
+    if (isUnlockMode) return; // static transform in unlock mode
     const animate = () => {
+      let finished = false;
       setTransform(prev => {
-        const lerpFactor = 0.15;
+        const lerpFactor = 0.2;
         const newX = prev.x + (targetTransform.x - prev.x) * lerpFactor;
         const newY = prev.y + (targetTransform.y - prev.y) * lerpFactor;
         const newScale = prev.scale + (targetTransform.scale - prev.scale) * lerpFactor;
-        
-        return {
-          x: newX,
-          y: newY,
-          scale: newScale
-        };
+        const dx = Math.abs(targetTransform.x - newX);
+        const dy = Math.abs(targetTransform.y - newY);
+        const ds = Math.abs(targetTransform.scale - newScale);
+        const epsilonPos = 0.1;
+        const epsilonScale = 0.001;
+        finished = dx < epsilonPos && dy < epsilonPos && ds < epsilonScale;
+        return finished ? { ...targetTransform } : { x: newX, y: newY, scale: newScale };
       });
-      
-      animationFrame = requestAnimationFrame(animate);
+      if (!finished) {
+        animationRef.current = requestAnimationFrame(animate);
+      } else if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
     };
-    
-    animationFrame = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [targetTransform]);
+    animationRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+  }, [targetTransform, isUnlockMode]);
+
+  // Display transform: in unlock mode use targetTransform directly (no state update)
+  const displayedTransform = isUnlockMode ? targetTransform : transform;
 
   // Keyboard controls for panning
   useEffect(() => {
@@ -111,14 +144,50 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick }) => {
   };
 
   // Get country color based on state
-  const getCountryColor = (countryId: string): string => {
-    const hasWarehouse = !!state.warehouses[countryId];
-    const hasFactory = Object.values(state.factories).some(f => f.countryId === countryId);
+  const isCountryLocked = (countryId: string): boolean => {
+    return !state.unlockedCountries.includes(countryId);
+  };
+
+  const handleCountryClickInternal = (countryId: string) => {
+    if (isUnlockMode) {
+      // If already unlocked, ignore
+      if (!isCountryLocked(countryId)) return;
+      // Game start: any country selectable
+      if (isGameStart) {
+        unlockCountry(countryId, true); // starting country free
+        setShowUnlockModal(false);
+        return;
+      }
+      // Unlock selection: any locked country can be chosen
+      if (offeredCountries.includes(countryId)) {
+        unlockCountry(countryId);
+        setShowUnlockModal(false);
+      }
+      return;
+    }
+    // Normal mode: always allow viewing info (even if locked)
+    onCountryClick(countryId);
+  };
+
+  const offeredCountriesSet = useMemo(() => new Set(offeredCountries), [offeredCountries]);
+
+  const getCountryFillColor = (countryId: string): string => {
+    if (isUnlockMode) {
+      // At game start, all countries are available
+      if (isGameStart) {
+        return '#81C784';
+      }
+      
+      // On level up, check if this country is in the offered list
+      if (offeredCountriesSet.has(countryId)) {
+        return '#81C784';
+      }
+      
+      return '#424242'; // Darker gray for unavailable
+    }
     
-    if (hasWarehouse && hasFactory) return '#4CAF50';
-    if (hasWarehouse) return '#8BC34A';
-    if (hasFactory) return '#FFC107';
-    return '#B0BEC5';
+    const isLocked = isCountryLocked(countryId);
+    return isLocked ? '#757575' : 'url(#grassTexture)';
   };
 
   return (
@@ -143,7 +212,7 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick }) => {
       <div 
         className="map-viewport"
         style={{
-          transform: `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`,
+          transform: `translate(${displayedTransform.x}px, ${displayedTransform.y}px) scale(${displayedTransform.scale})`,
           transformOrigin: 'center center'
         }}
       >
@@ -174,26 +243,53 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick }) => {
             style={{ pointerEvents: 'all' }}
           />
 
+          {/* Roads Layer */}
+          <g className="roads-layer">
+            {Object.values(state.roads).map(road => {
+              const from = europeCountriesGeo.find(c => c.id === road.fromCountryId);
+              const to = europeCountriesGeo.find(c => c.id === road.toCountryId);
+              if (!from || !to) return null;
+              const [fx, fy] = from.centroid;
+              const [tx, ty] = to.centroid;
+              return (
+                <line
+                  key={road.id}
+                  className="road"
+                  x1={fx}
+                  y1={-fy}
+                  x2={tx}
+                  y2={-ty}
+                />
+              );
+            })}
+          </g>
           {/* Countries */}
           <g className="countries-layer">
             {europeCountriesGeo.map(country => {
               const countryData = state.countries[country.id];
               if (!countryData) return null;
               
+              const isLocked = isCountryLocked(country.id);
+              // In normal mode all countries are clickable (info view). In unlock mode only offered or already unlocked.
+              const isClickable = !isUnlockMode || !isLocked || (isUnlockMode && (isGameStart || offeredCountriesSet.has(country.id)));
+              
               return (
                 <g key={country.id}>
                   <path
-                    d={coordinatesToPath(country.coordinates)}
-                    fill="url(#grassTexture)"
+                    d={countryPathMap[country.id]}
+                    fill={getCountryFillColor(country.id)}
                     stroke="#000000"
+                    strokeOpacity="1"
                     strokeWidth="0.08"
                     strokeLinejoin="round"
                     strokeLinecap="round"
                     className="country"
                     data-country-id={country.id}
-                    onClick={() => onCountryClick(country.id)}
+                    onClick={() => handleCountryClickInternal(country.id)}
                     style={{
-                      opacity: getCountryColor(country.id) === '#81C784' ? 1 : 0.92
+                      opacity: isUnlockMode ? 1 : (isLocked ? 0.6 : 0.92),
+                      cursor: isClickable ? 'pointer' : 'not-allowed',
+                      transition: 'fill 0.2s'
                     }}
                   />
                 </g>

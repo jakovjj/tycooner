@@ -75,10 +75,210 @@
   color: #EF9A9A;
 }
 
+.exp-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
 .controls-panel {
   display: flex;
   gap: 15px;
   align-items: center;
+}
+
+/* Settings Button */
+.settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: all .25s ease;
+  letter-spacing: .5px;
+}
+
+.settings-btn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.settings-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.settings-icon svg {
+  display: block;
+  color: #fff;
+}
+
+.settings-text {
+  line-height: 1;
+}
+
+/* Hamburger Button */
+.hamburger-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .25s ease;
+  backdrop-filter: blur(6px);
+}
+
+.hamburger-btn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.hamburger-btn:active { transform: translateY(0); }
+
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hamburger-icon span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+}
+
+.settings-menu {
+  display: none; /* legacy dropdown disabled */
+}
+
+.settings-menu .menu-item {
+  display: none;
+}
+
+.settings-menu .menu-item:hover { /* legacy removed */ }
+
+/* Full-screen settings overlay */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+  animation: overlayFade .25s ease;
+}
+
+@keyframes overlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.settings-panel {
+  background: #1f2937; /* slate-800 */
+  border: 1px solid #334155; /* slate-700 */
+  border-radius: 12px;
+  width: min(560px,88%);
+  padding: 32px 36px;
+  color: #f1f5f9; /* slate-50 */
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  animation: panelSlide .35s ease;
+}
+
+@keyframes panelSlide {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.settings-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.settings-title {
+  font-size: 26px;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.overlay-close-btn {
+  background: #334155;
+  border: 1px solid #475569;
+  color: #f1f5f9;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .25s ease;
+}
+
+.overlay-close-btn:hover { background: #475569; transform: translateY(-2px); }
+
+.settings-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.primary-menu-btn {
+  padding: 14px 22px;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(90deg,#2563EB,#1D4ED8);
+  border: 1px solid #1D4ED8;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  transition: all .25s ease;
+}
+
+.primary-menu-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,0.45); }
+.primary-menu-btn:active { transform: translateY(0); }
+
+@media (max-width: 600px) {
+  .settings-panel { padding: 24px 26px; gap: 22px; }
+  .settings-title { font-size: 22px; }
+  .overlay-close-btn { width: 36px; height: 36px; font-size: 18px; }
+  .primary-menu-btn { font-size: 15px; padding: 12px 18px; }
 }
 
 .speed-controls {
