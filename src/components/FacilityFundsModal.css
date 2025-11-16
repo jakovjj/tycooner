@@ -1,0 +1,43 @@
+.facility-funds-card {
+  max-width: 420px;
+  text-align: center;
+}
+
+.facility-funds-icon {
+  background: linear-gradient(135deg, #f56565, #ed8936);
+  color: #fff;
+}
+
+.facility-funds-breakdown {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.facility-funds-breakdown div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.facility-funds-breakdown span {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.facility-funds-breakdown strong {
+  font-size: 1.05rem;
+}
+
+.facility-funds-shortfall {
+  color: #ff7878;
+}
+
+.ui-modal-body.subtle {
+  color: rgba(255, 255, 255, 0.7);
+}

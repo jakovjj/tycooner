@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { GameProvider, useGame } from './context/GameContext';
 import { EuropeMap } from './components/EuropeMap';
 import { TopBar } from './components/TopBar';
@@ -7,6 +7,7 @@ import { ChallengeBanner } from './components/ChallengeBanner';
 import { CountryManagementModal } from './components/CountryManagementModal';
 import { LoadingScreen } from './components/LoadingScreen';
 import { FacilityWarningModal } from './components/FacilityWarningModal';
+import { UnlockFundsModal } from './components/UnlockFundsModal';
 import './App.css';
 
 const LedgerIcon = () => (
@@ -32,37 +33,13 @@ function GameContent() {
     isGameStart,
     facilityWarning,
     dismissFacilityWarning,
+    unlockFundsWarning,
+    dismissUnlockFundsWarning,
     restartGame
   } = useGame();
-  const [isAutoRestarting, setIsAutoRestarting] = useState(false);
-  const restartTimeoutRef = useRef<number | null>(null);
 
   const allUnlocked = state.unlockedCountries.length === Object.keys(state.countries).length;
   const challengeFailed = state.gameOver && !allUnlocked;
-
-  useEffect(() => {
-    if (!challengeFailed) {
-      setIsAutoRestarting(false);
-      if (restartTimeoutRef.current) {
-        clearTimeout(restartTimeoutRef.current);
-        restartTimeoutRef.current = null;
-      }
-    } else if (!restartTimeoutRef.current) {
-      setIsAutoRestarting(true);
-      restartTimeoutRef.current = window.setTimeout(() => {
-        restartTimeoutRef.current = null;
-        setIsAutoRestarting(false);
-        restartGame();
-      }, 1800);
-    }
-
-    return () => {
-      if (restartTimeoutRef.current && !challengeFailed) {
-        clearTimeout(restartTimeoutRef.current);
-        restartTimeoutRef.current = null;
-      }
-    };
-  }, [challengeFailed, restartGame]);
 
   const handleCountryClick = (countryId: string) => {
     // If we're in unlock mode, don't open the management modal
@@ -134,12 +111,24 @@ function GameContent() {
         <FacilityWarningModal onClose={dismissFacilityWarning} />
       )}
 
-      {isAutoRestarting && (
+      {unlockFundsWarning && (
+        <UnlockFundsModal
+          countryName={state.countries[unlockFundsWarning.countryId]?.name ?? ''}
+          cost={unlockFundsWarning.cost}
+          currentMoney={state.money}
+          onClose={dismissUnlockFundsWarning}
+        />
+      )}
+
+      {challengeFailed && (
         <div className="global-overlay" aria-live="assertive">
           <div className="global-overlay-card">
             <span className="global-overlay-icon" aria-hidden="true">⚠️</span>
             <h3>Challenge Failed</h3>
-            <p>Resetting the campaign so you can try again.</p>
+            <p>You ran out of time on this unlock. Restart when you&apos;re ready.</p>
+            <button className="global-overlay-btn" onClick={restartGame}>
+              Restart Campaign
+            </button>
           </div>
         </div>
       )}

@@ -1,0 +1,45 @@
+.unlock-funds-card {
+  max-width: 420px;
+  text-align: center;
+}
+
+.unlock-funds-icon {
+  background: linear-gradient(135deg, #ffd166, #fca311);
+  color: #1f1400;
+}
+
+.unlock-funds-breakdown {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin: 1.2rem 0 0.2rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  font-size: 0.95rem;
+}
+
+.unlock-funds-breakdown span {
+  display: block;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(226, 232, 240, 0.75);
+  margin-bottom: 0.2rem;
+}
+
+.unlock-funds-breakdown strong {
+  font-size: 1.25rem;
+  color: #f8fafc;
+}
+
+.unlock-funds-shortfall {
+  color: #f87171;
+}
+
+.unlock-funds-card .subtle {
+  color: rgba(226, 232, 240, 0.78);
+  font-size: 0.9rem;
+  margin-top: 0.2rem;
+}

@@ -14,6 +14,8 @@ export interface Good {
   basePrice: number;
   laborIntensity: number; // 0-1
   resourceIntensity: number; // 0-1
+  emoji: string;
+  color?: string;
 }
 
 export interface Market {

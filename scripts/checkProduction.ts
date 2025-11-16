@@ -1,6 +1,6 @@
-import { createInitialGameState } from '../src/data/initialGameState';
-import type { GameState, ProductionBuildingInstance } from '../src/types/game';
-import { simulateTick } from '../src/context/GameContext';
+import { createInitialGameState } from '../src/data/initialGameState.ts';
+import type { GameState, ProductionBuildingInstance } from '../src/types/game.ts';
+import { simulateTick } from '../src/context/GameContext.tsx';
 
 function makeStateWithFacilities(count: number): GameState {
   const base = createInitialGameState();

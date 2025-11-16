@@ -29,6 +29,10 @@ interface GameContextType {
   restartGame: () => void;
   facilityWarning: boolean;
   dismissFacilityWarning: () => void;
+  unlockFundsWarning: { countryId: string; cost: number } | null;
+  dismissUnlockFundsWarning: () => void;
+  facilityFundsWarning: { countryId: string; type: ProductionType; cost: number } | null;
+  dismissFacilityFundsWarning: () => void;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -49,6 +53,10 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Level/experience removed; track only unlocked countries and money.
   const [facilityWarning, setFacilityWarning] = useState(false);
   const dismissFacilityWarning = useCallback(() => setFacilityWarning(false), []);
+  const [unlockFundsWarning, setUnlockFundsWarning] = useState<{ countryId: string; cost: number } | null>(null);
+  const dismissUnlockFundsWarning = useCallback(() => setUnlockFundsWarning(null), []);
+  const [facilityFundsWarning, setFacilityFundsWarning] = useState<{ countryId: string; type: ProductionType; cost: number } | null>(null);
+  const dismissFacilityFundsWarning = useCallback(() => setFacilityFundsWarning(null), []);
 
   // Start the next timed challenge (unlock a neighboring locked country within 5 minutes)
   const startNextChallenge = useCallback((prev: GameState): GameState => {
@@ -90,7 +98,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       const cost = free || unlockedCount === 0 ? 0 : Math.round(5000 * Math.pow(1.5, unlockedCount));
       if (prev.money < cost) {
-        alert(`Not enough money to unlock. Need $${cost.toLocaleString()}`);
+        setUnlockFundsWarning({ countryId, cost });
         return prev;
       }
       let updated: GameState = {
@@ -106,6 +114,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (updated.challengeTargetCountryId && updated.unlockedCountries.includes(updated.challengeTargetCountryId)) {
         updated = startNextChallenge(updated);
       }
+      setUnlockFundsWarning(null);
       return updated;
     });
   }, [startNextChallenge]);
@@ -204,7 +213,7 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const cost = 5000;
       if (prev.money < cost) {
-        alert('Not enough money!');
+  setFacilityFundsWarning({ countryId, type: type, cost });
         return prev;
       }
 
@@ -410,41 +419,56 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const pricing = country.productionPricing;
       if (!pricing) return prev;
 
-      let cost = 0;
-      if (type === 'farm') cost = pricing.farmBuildCost;
-      else if (type === 'factory') cost = pricing.factoryBuildCost;
-      else if (type === 'ranch') cost = pricing.ranchBuildCost;
-
-      if (prev.money < cost) {
-        alert('Not enough money!');
-        return prev;
-      }
-      const existingProduction = prev.production[countryId];
       const BUILDING_LIMIT_DIVISORS: Record<ProductionType, number> = {
         farm: 12_000_000,
         factory: 20_000_000,
         ranch: 15_000_000
       };
-  // Each facility produces exactly 1 unit per day
-  const OUTPUTS: Record<ProductionType, number> = { farm: 1, factory: 1, ranch: 1 };
+      const OUTPUTS: Record<ProductionType, number> = { farm: 1, factory: 1, ranch: 1 };
+
+      const cost = type === 'farm' ? pricing.farmBuildCost : type === 'factory' ? pricing.factoryBuildCost : pricing.ranchBuildCost;
+      if (prev.money < cost) {
+        setFacilityFundsWarning({ countryId, type, cost });
+        return prev;
+      }
+
       const limit = Math.max(1, Math.floor(country.population / BUILDING_LIMIT_DIVISORS[type]));
-      const newProduction: CountryProduction = existingProduction || {
-        countryId,
-        buildings: { farm: [], factory: [], ranch: [] }
-      };
-      const currentCount = newProduction.buildings[type].length;
+      const existingProduction = prev.production[countryId];
+      const baseProduction: CountryProduction = existingProduction
+        ? {
+            ...existingProduction,
+            buildings: {
+              farm: [...existingProduction.buildings.farm],
+              factory: [...existingProduction.buildings.factory],
+              ranch: [...existingProduction.buildings.ranch]
+            }
+          }
+        : {
+            countryId,
+            buildings: { farm: [], factory: [], ranch: [] }
+          };
+
+      const currentCount = baseProduction.buildings[type].length;
       if (currentCount >= limit) {
         alert(`Limit reached for ${type} buildings (max ${limit})`);
         return prev;
       }
-  newProduction.buildings[type] = [...newProduction.buildings[type], { type, outputPerDay: OUTPUTS[type] }];
 
+      const updatedProduction: CountryProduction = {
+        ...baseProduction,
+        buildings: {
+          ...baseProduction.buildings,
+          [type]: [...baseProduction.buildings[type], { type, outputPerDay: OUTPUTS[type] }]
+        }
+      };
+
+      setFacilityFundsWarning(null);
       return {
         ...prev,
         money: prev.money - cost,
         production: {
           ...prev.production,
-          [countryId]: newProduction
+          [countryId]: updatedProduction
         }
       };
     });
@@ -500,15 +524,25 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Simulation tick - run every day
   useEffect(() => {
+    const hasStarted = state.unlockedCountries.length > 0;
+    if (!hasStarted) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      return () => undefined;
+    }
+
     intervalRef.current = window.setInterval(() => {
       setState(prev => simulateTick(prev));
     }, state.tickSpeed);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
     };
-  }, [state.tickSpeed]);
+  }, [state.tickSpeed, state.unlockedCountries.length]);
 
   const getNextUnlockCost = useCallback(() => {
     const unlockedCount = state.unlockedCountries.length;
@@ -559,7 +593,11 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     restartGame,
     destroyProductionBuilding,
     facilityWarning,
-    dismissFacilityWarning
+    dismissFacilityWarning,
+    unlockFundsWarning,
+    dismissUnlockFundsWarning,
+    facilityFundsWarning,
+    dismissFacilityFundsWarning
   };
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
@@ -583,7 +621,7 @@ export function simulateTick(prevState: GameState): GameState {
 
 // Simulate production from factories
 export function simulateProduction(state: GameState): GameState {
-  const newWarehouses = { ...state.warehouses };
+  const newWarehouses = cloneWarehouses(state.warehouses);
   
   // Production from old factories (existing goods system)
   Object.values(state.factories).forEach(factory => {
@@ -629,7 +667,7 @@ export function simulateProduction(state: GameState): GameState {
 
 // Simulate logistics (truck movements)
 export function simulateLogistics(state: GameState): GameState {
-  const newWarehouses = { ...state.warehouses };
+  const newWarehouses = cloneWarehouses(state.warehouses);
   let totalCost = 0;
   
   Object.values(state.truckLines).forEach(line => {
@@ -701,4 +739,15 @@ export function simulateMarkets(state: GameState): GameState {
     ...state,
     markets: newMarkets
   };
+}
+
+function cloneWarehouses(source: Record<string, Warehouse>): Record<string, Warehouse> {
+  const clone: Record<string, Warehouse> = {};
+  Object.entries(source).forEach(([countryId, warehouse]) => {
+    clone[countryId] = {
+      ...warehouse,
+      storage: { ...warehouse.storage }
+    };
+  });
+  return clone;
 }

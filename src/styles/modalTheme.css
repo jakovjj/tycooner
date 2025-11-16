@@ -1,0 +1,110 @@
+:root {
+  --modal-overlay-bg: rgba(7, 11, 23, 0.7);
+  --modal-card-gradient-start: #0f172a;
+  --modal-card-gradient-end: #1e3a8a;
+  --modal-card-border: rgba(255, 255, 255, 0.16);
+  --modal-card-shadow: 0 30px 60px rgba(2, 6, 23, 0.6);
+  --modal-radius: 22px;
+  --modal-text-color: #f8fafc;
+}
+
+.ui-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--modal-overlay-bg);
+  backdrop-filter: blur(8px);
+  z-index: 1500;
+  animation: uiOverlayFade 0.3s ease;
+}
+
+.ui-modal-card {
+  width: min(520px, 92%);
+  background: linear-gradient(150deg, var(--modal-card-gradient-start), var(--modal-card-gradient-end));
+  color: var(--modal-text-color);
+  border-radius: var(--modal-radius);
+  padding: 34px;
+  border: 1px solid var(--modal-card-border);
+  box-shadow: var(--modal-card-shadow);
+  text-align: center;
+  animation: uiModalRise 0.35s ease;
+}
+
+.ui-modal-card.full-width {
+  width: min(680px, 94%);
+}
+
+.ui-modal-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.ui-modal-body {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  opacity: 0.92;
+  margin-bottom: 1.75rem;
+}
+
+.ui-modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ui-modal-btn {
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  color: white;
+  box-shadow: 0 12px 26px rgba(14, 165, 233, 0.4);
+  background: linear-gradient(120deg, #38bdf8, #6366f1);
+}
+
+.ui-modal-btn:hover {
+  transform: translateY(-2px);
+}
+
+.ui-modal-btn.secondary {
+  background: rgba(248, 250, 252, 0.15);
+  border: 1px solid rgba(248, 250, 252, 0.3);
+  box-shadow: none;
+}
+
+.ui-modal-icon {
+  font-size: 2.75rem;
+  margin-bottom: 0.6rem;
+}
+
+@keyframes uiOverlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes uiModalRise {
+  from { transform: translateY(24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 520px) {
+  .ui-modal-card {
+    padding: 26px 22px;
+  }
+
+  .ui-modal-title {
+    font-size: 1.45rem;
+  }
+
+  .ui-modal-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

@@ -72,14 +72,18 @@ export const TopBar: React.FC = () => {
         </button>
       </div>
       {showMenu && (
-        <div className="settings-overlay" onClick={() => setShowMenu(false)} role="dialog" aria-modal="true">
-          <div className="settings-panel" onClick={e => e.stopPropagation()}>
+        <div className="ui-overlay settings-overlay" onClick={() => setShowMenu(false)} role="dialog" aria-modal="true">
+          <div className="ui-modal-card full-width settings-panel" onClick={e => e.stopPropagation()}>
             <div className="settings-panel-header">
-              <h2 className="settings-title">Menu</h2>
+              <div>
+                <div className="settings-chip">Game Controls</div>
+                <h2 className="settings-title">Pause Menu</h2>
+              </div>
               <button className="overlay-close-btn" onClick={() => setShowMenu(false)} aria-label="Close menu">×</button>
             </div>
+            <p className="settings-helper">Restart instantly resets your progress but keeps the current challenge rotation.</p>
             <div className="settings-panel-body">
-              <button onClick={restartGame} className="primary-menu-btn">Restart Game</button>
+              <button onClick={restartGame} className="ui-modal-btn primary-menu-btn">Restart Game</button>
             </div>
           </div>
         </div>

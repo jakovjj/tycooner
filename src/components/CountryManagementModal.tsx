@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
+import { FaRoad, FaTrain } from 'react-icons/fa';
 import { useGame } from '../context/GameContext';
 import type { ProductionPricing, ProductionType } from '../types/game';
 import './CountryManagementModal.css';
 // Row component for transferring goods (needed to use hooks correctly)
-const TransferRow: React.FC<{ countryId: string; neighborId: string; goodId: string; amount: number; maxAmount: number; transferGoods: (fromId: string, toId: string, goodId: string, amt: number) => void; goodName: string; }> = ({ countryId, neighborId, goodId, amount, maxAmount, transferGoods, goodName }) => {
+const TransferRow: React.FC<{ countryId: string; neighborId: string; goodId: string; amount: number; maxAmount: number; transferGoods: (fromId: string, toId: string, goodId: string, amt: number) => void; goodName: string; goodEmoji?: string; }> = ({ countryId, neighborId, goodId, amount, maxAmount, transferGoods, goodName, goodEmoji }) => {
   const [inputValue, setInputValue] = React.useState<string>('');
   return (
     <div className="transfer-row">
-      <span>{goodName}: {Math.round(amount)}u</span>
+      <span>{goodEmoji ? `${goodEmoji} ` : ''}{goodName}: {Math.round(amount)}u</span>
       <input
         type="number"
         min={0}
@@ -66,19 +67,6 @@ export const CountryManagementModal: React.FC<CountryManagementModalProps> = ({ 
     return Object.values(warehouse.storage).reduce((sum, amt) => sum + amt, 0);
   };
 
-  // Market pricing removed; only static sell price per unit shown
-
-  const calculateSellPrice = (goodId: string, amount: number): number => {
-    const pricing = country.productionPricing;
-    if (!pricing) return 0;
-    const priceMap: Record<string, number> = {
-      grain: pricing.grainSellPrice,
-      clothing: pricing.clothingSellPrice,
-      meat: pricing.meatSellPrice
-    };
-    return amount * (priceMap[goodId] || 0);
-  };
-
   const renderInfoTab = () => {
     const pricing = country.productionPricing;
     if (!pricing) {
@@ -90,9 +78,9 @@ export const CountryManagementModal: React.FC<CountryManagementModalProps> = ({ 
       );
     }
     const goods: { id: string; label: string; icon: string; pricingKey: keyof ProductionPricing }[] = [
-      { id: 'grain', label: 'Grain', icon: '🌾', pricingKey: 'grainSellPrice' },
-      { id: 'clothing', label: 'Clothing', icon: '👕', pricingKey: 'clothingSellPrice' },
-      { id: 'meat', label: 'Meat', icon: '🥩', pricingKey: 'meatSellPrice' }
+      { id: 'grain', label: state.goods.grain?.name || 'Grain', icon: state.goods.grain?.emoji || '🌾', pricingKey: 'grainSellPrice' },
+      { id: 'clothing', label: state.goods.clothing?.name || 'Clothing', icon: state.goods.clothing?.emoji || '👕', pricingKey: 'clothingSellPrice' },
+      { id: 'meat', label: state.goods.meat?.name || 'Meat', icon: state.goods.meat?.emoji || '🥩', pricingKey: 'meatSellPrice' }
     ];
 
     return (
@@ -143,12 +131,7 @@ export const CountryManagementModal: React.FC<CountryManagementModalProps> = ({ 
       return;
     }
 
-    const sellPrice = calculateSellPrice(goodId, amount);
-    const good = state.goods[goodId];
-    
-    if (confirm(`Sell ${Math.round(amount)} units of ${good.name} for $${Math.round(sellPrice)}?`)) {
-      sellGood(countryId, goodId, amount);
-    }
+    sellGood(countryId, goodId, amount);
   };
 
   const renderStorageTab = () => {
@@ -218,7 +201,10 @@ export const CountryManagementModal: React.FC<CountryManagementModalProps> = ({ 
                   return (
                     <div key={goodId} className="storage-item">
                       <div className="item-info">
-                        <span className="item-name">{good.name}</span>
+                        <span className="item-name">
+                          <span className="item-emoji" aria-hidden="true">{good?.emoji ?? '📦'}</span>
+                          {good.name}
+                        </span>
                         <span className="item-amount">{Math.round(amount)} units</span>
                       </div>
                       <div className="item-pricing">
@@ -305,7 +291,9 @@ export const CountryManagementModal: React.FC<CountryManagementModalProps> = ({ 
                       <p>Produces {meta.good}</p>
                     </div>
                   </div>
-                    <span className="sell-price-label">Sell Price $ {meta.sellPrice.toFixed(2)}/unit</span>
+                    <span className="sell-price-label">
+                      Sell Price <strong>${meta.sellPrice.toFixed(2)}</strong>/unit
+                    </span>
                 </div>
                 <div className="production-status multi">
                   <div className="production-stats">
@@ -353,24 +341,46 @@ export const CountryManagementModal: React.FC<CountryManagementModalProps> = ({ 
             const neighborWarehouse = state.warehouses[nId];
             const canBuild = !road && state.unlockedCountries.includes(countryId) && state.unlockedCountries.includes(nId) && state.money >= 2000 && country.neighbors.includes(nId);
             const goodsInWarehouse = warehouse ? Object.entries(warehouse.storage).filter(([, amt]) => amt > 0) : [];
+            const hasRoad = Boolean(road);
             return (
               <div key={nId} className="distribution-item">
                 <div className="dist-header">
-                  <strong>{neighbor.name}</strong>
-                  {road ? <span className="road-badge">Road Built</span> : <span className="road-badge pending">No Road</span>}
+                  <div className="dist-country">
+                    <span className={`dist-icon ${hasRoad ? 'active' : ''}`}>
+                      {hasRoad ? <FaTrain aria-hidden="true" /> : <FaRoad aria-hidden="true" />}
+                    </span>
+                    <div>
+                      <span className="dist-label">Neighbor</span>
+                      <strong>{neighbor.name}</strong>
+                    </div>
+                  </div>
+                  <span className={`road-badge ${hasRoad ? 'active' : 'pending'}`}>
+                    {hasRoad ? 'Rail Link Active' : 'No Road'}
+                  </span>
                 </div>
-                {!road && (
-                  <button
-                    className="build-btn"
-                    disabled={!canBuild}
-                    onClick={() => buildRoad(countryId, nId)}
-                  >Build Road ($2,000)</button>
+
+                {!hasRoad && (
+                  <div className="dist-actions">
+                    <p className="dist-helper">Spend $2,000 to unlock instant transfers between warehouses.</p>
+                    <button
+                      className="build-road-btn"
+                      disabled={!canBuild}
+                      onClick={() => buildRoad(countryId, nId)}
+                    >
+                      <FaTrain aria-hidden="true" />
+                      Build Rail Link ($2,000)
+                    </button>
+                  </div>
                 )}
-                {road && warehouse && neighborWarehouse && goodsInWarehouse.length > 0 && (
+
+                {hasRoad && warehouse && neighborWarehouse && (
                   <div className="transfer-section">
                     <h4 style={{ margin: '6px 0' }}>Transfer Goods</h4>
-                    {goodsInWarehouse.map(([gid, amt]) => (
-                      <TransferRow 
+                    {goodsInWarehouse.length === 0 && (
+                      <p className="empty-storage">No goods available to transfer.</p>
+                    )}
+                    {goodsInWarehouse.length > 0 && goodsInWarehouse.map(([gid, amt]) => (
+                      <TransferRow
                         key={gid}
                         countryId={countryId}
                         neighborId={nId}
@@ -379,9 +389,9 @@ export const CountryManagementModal: React.FC<CountryManagementModalProps> = ({ 
                         maxAmount={Math.floor(amt)}
                         transferGoods={transferGoods}
                         goodName={state.goods[gid]?.name || gid}
+                        goodEmoji={state.goods[gid]?.emoji}
                       />
                     ))}
-                    {goodsInWarehouse.length === 0 && <p className="empty-storage">No goods available to transfer.</p>}
                   </div>
                 )}
               </div>

@@ -19,13 +19,14 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMo
   const { state, unlockCountry, setShowUnlockModal } = useGame();
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, scale: 0.55 });
   const [targetTransform, setTargetTransform] = useState<Transform>({ x: 0, y: -300, scale: 0.55 });
+  const isStartSelection = isUnlockMode && isGameStart;
   
   // Memoize the offered countries to prevent re-randomization
   const offeredCountries = useMemo(() => {
     if (!isUnlockMode) return [];
+    if (isGameStart) return [];
     const allCountryIds = Object.keys(state.countries);
-    const lockedCountries = allCountryIds.filter(id => !state.unlockedCountries.includes(id));
-    return isGameStart ? allCountryIds : lockedCountries; // all locked countries available for selection
+    return allCountryIds.filter(id => !state.unlockedCountries.includes(id));
   }, [isUnlockMode, isGameStart, state.countries, state.unlockedCountries]);
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState<{ x: number; y: number } | null>(null);
@@ -88,6 +89,7 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMo
   // Keyboard controls for panning
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isStartSelection) return;
       const panSpeed = 50;
       const key = event.key.toLowerCase();
       
@@ -110,11 +112,12 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMo
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isStartSelection]);
 
   // Handle zoom
   const handleWheel = (event: React.WheelEvent) => {
     event.preventDefault();
+    if (isStartSelection) return;
     const delta = -event.deltaY * 0.001;
     const newScale = Math.max(0.5, Math.min(5, targetTransform.scale * (1 + delta)));
     
@@ -123,12 +126,14 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMo
 
   // Handle pan start
   const handlePanStart = (clientX: number, clientY: number) => {
+    if (isStartSelection) return;
     setIsPanning(true);
     setPanStart({ x: clientX - transform.x, y: clientY - transform.y });
   };
 
   // Handle pan move
   const handlePanMove = (clientX: number, clientY: number) => {
+    if (isStartSelection) return;
     if (isPanning && panStart) {
       const newX = clientX - panStart.x;
       const newY = clientY - panStart.y;
@@ -139,6 +144,7 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMo
 
   // Handle pan end
   const handlePanEnd = () => {
+    if (isStartSelection) return;
     setIsPanning(false);
     setPanStart(null);
   };
@@ -173,19 +179,15 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMo
 
   const getCountryFillColor = (countryId: string): string => {
     if (isUnlockMode) {
-      // At game start, all countries are available
       if (isGameStart) {
-        return '#81C784';
+        return '#757575';
       }
-      
-      // On level up, check if this country is in the offered list
       if (offeredCountriesSet.has(countryId)) {
         return '#81C784';
       }
-      
-      return '#424242'; // Darker gray for unavailable
+      return '#424242';
     }
-    
+
     const isLocked = isCountryLocked(countryId);
     return isLocked ? '#757575' : 'url(#grassTexture)';
   };
@@ -238,7 +240,7 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMo
             y={-bounds.maxLat}
             width={viewBoxWidth}
             height={viewBoxHeight}
-            fill="#4FC3F7"
+            fill="#1f3f60"
             className="ocean-background"
             style={{ pointerEvents: 'all' }}
           />
@@ -304,21 +306,39 @@ export const EuropeMap: React.FC<EuropeMapProps> = ({ onCountryClick, isUnlockMo
               if (!countryData) return null;
               
               const [lon, lat] = country.centroid;
-              const warehouses = state.warehouses[country.id];
+              const warehouse = state.warehouses[country.id];
               const factoryCount = Object.values(state.factories).filter(f => f.countryId === country.id).length;
+              const warehouseFill = warehouse ? Math.min(1, Object.values(warehouse.storage).reduce((sum, amt) => sum + amt, 0) / Math.max(1, warehouse.capacity)) : 0;
+              const barWidth = 1.3;
+              const barHeight = 0.35;
+              const barX = country.centroid[0] - barWidth / 2;
+              const barY = -country.centroid[1] - 0.2;
               
               return (
                 <g key={`indicators-${country.id}`}>
-                  {warehouses && (
-                    <circle
-                      cx={lon - 0.5}
-                      cy={-lat}
-                      r="0.35"
-                      fill="#FF9800"
-                      stroke="#FFF"
-                      strokeWidth="0.08"
-                      pointerEvents="none"
-                    />
+                  {warehouse && (
+                    <g pointerEvents="none">
+                      <rect
+                        x={barX}
+                        y={barY}
+                        width={barWidth}
+                        height={barHeight}
+                        rx={0.08}
+                        ry={0.08}
+                        fill="rgba(15,23,42,0.55)"
+                        stroke="rgba(255,255,255,0.35)"
+                        strokeWidth={0.04}
+                      />
+                      <rect
+                        x={barX + 0.04}
+                        y={barY + 0.05}
+                        width={(barWidth - 0.08) * warehouseFill}
+                        height={barHeight - 0.1}
+                        rx={0.06}
+                        ry={0.06}
+                        fill="#f97316"
+                      />
+                    </g>
                   )}
                   
                   {factoryCount > 0 && (

@@ -4,7 +4,7 @@
   position: relative;
   overflow: hidden;
   cursor: grab;
-  background: #4FC3F7;
+  background: #1f3f60;
 }
 
 .map-container:active {

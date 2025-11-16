@@ -1,5 +1,6 @@
 import type { Good, Country, GameState, Market, ProductionPricing } from '../types/game';
 import { europeCountriesGeo } from './europeMapGeo';
+import { buildGoodsCatalog } from './resources';
 
 // Helper to generate varied pricing based on country characteristics
 // Real-world inspired base prices (unit = ~1kg) scaled for gameplay
@@ -92,57 +93,8 @@ function generateProductionPricing(countryId: string, wageLevel: number): Produc
   };
 }
 
-// Initial goods catalog
-export const initialGoods: Record<string, Good> = {
-  grain: {
-    id: 'grain',
-    name: 'Grain',
-    category: 'food',
-    basePrice: REAL_WORLD_BASE.grain,
-    laborIntensity: 0.3,
-    resourceIntensity: 0.7
-  },
-  clothing: {
-    id: 'clothing',
-    name: 'Clothing',
-    category: 'consumer',
-    basePrice: REAL_WORLD_BASE.clothing,
-    laborIntensity: 0.6,
-    resourceIntensity: 0.4
-  },
-  meat: {
-    id: 'meat',
-    name: 'Meat',
-    category: 'food',
-    basePrice: REAL_WORLD_BASE.meat,
-    laborIntensity: 0.4,
-    resourceIntensity: 0.6
-  },
-  consumerGoods: {
-    id: 'consumerGoods',
-    name: 'Consumer Goods',
-    category: 'consumer',
-    basePrice: 100,
-    laborIntensity: 0.7,
-    resourceIntensity: 0.4
-  },
-  electronics: {
-    id: 'electronics',
-    name: 'Electronics',
-    category: 'manufactured',
-    basePrice: 200,
-    laborIntensity: 0.8,
-    resourceIntensity: 0.5
-  },
-  processedFood: {
-    id: 'processedFood',
-    name: 'Processed Food',
-    category: 'food',
-    basePrice: 30,
-    laborIntensity: 0.5,
-    resourceIntensity: 0.6
-  }
-};
+// Initial goods catalog sourced from centralized metadata for easy future additions
+export const initialGoods: Record<string, Good> = buildGoodsCatalog();
 
 // Country properties (economic characteristics)
 const countryProperties: Record<string, { 

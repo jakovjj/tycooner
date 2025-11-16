@@ -280,6 +280,122 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.distribution-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.distribution-item {
+  background: white;
+  border: 1px solid #E0E0E0;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+
+.dist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.dist-country {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dist-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.08);
+  color: #475569;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.dist-icon.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.dist-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+}
+
+.road-badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  color: #475569;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.road-badge.active {
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #047857;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.road-badge.pending {
+  color: #b45309;
+  border-color: rgba(249, 115, 22, 0.4);
+  background: rgba(251, 191, 36, 0.15);
+}
+
+.dist-actions {
+  margin-top: 14px;
+}
+
+.dist-helper {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.build-road-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #2563eb, #1d4ed8);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(37, 99, 235, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.build-road-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.build-road-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(37, 99, 235, 0.35);
+}
+
+.transfer-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #E2E8F0;
+}
+
 .item-info {
   display: flex;
   justify-content: space-between;
@@ -291,6 +407,13 @@
   color: #333;
   font-weight: 600;
   font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-emoji {
+  font-size: 1.35rem;
 }
 
 .item-amount {
@@ -402,17 +525,18 @@
 }
 
 .production-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
 }
 
 .production-item {
   background: #F9F9F9;
   border: 2px solid #E0E0E0;
   border-radius: 12px;
-  padding: 20px;
+  padding: 16px;
   transition: all 0.2s;
+  min-height: 170px;
 }
 
 .production-item:hover {
@@ -423,10 +547,10 @@
 
 .production-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .production-header-left {
@@ -436,19 +560,19 @@
 }
 
 .production-icon {
-  font-size: 48px;
+  font-size: 32px;
 }
 
 .production-name h4 {
-  margin: 0 0 4px 0;
-  color: #333;
-  font-size: 20px;
+  margin: 0 0 2px 0;
+  color: #0f172a;
+  font-size: 16px;
 }
 
 .production-name p {
   margin: 0;
   color: #666;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 .production-build {
@@ -467,7 +591,7 @@
 .production-status {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .production-stats {
@@ -478,12 +602,12 @@
 
 .production-stats .stat {
   background: white;
-  padding: 8px 16px;
+  padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid #E0E0E0;
   color: #333;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* Level badge styling */
@@ -517,13 +641,31 @@
 
 .production-price .price-value {
   font-weight: 800;
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: 0.2px;
+}
+
+.sell-price-label {
+  color: #22c55e;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.sell-price-label strong {
+  font-size: 1.15rem;
+  margin: 0 2px;
 }
 
 .production-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.production-actions .build-btn,
+.production-actions .sell-btn {
+  flex: 1 1 auto;
+  min-width: 120px;
 }
 
 .production-actions .upgrade-btn {
